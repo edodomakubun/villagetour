@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduGame Creator</title>
+    <!-- Bootstrap 5.3 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#" onclick="showView('dashboard')">
+                <i class="fa-solid fa-graduation-cap me-2"></i>EduGame
+            </a>
+            <div class="d-flex align-items-center">
+                <div class="dropdown me-3">
+                    <button class="btn btn-outline-light dropdown-toggle" type="button" id="langDropdown" data-bs-toggle="dropdown">
+                        <i class="fa-solid fa-globe"></i> <span id="currentLangLabel">ID</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#" onclick="changeLanguage('id')">Bahasa Indonesia</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="changeLanguage('en')">English</a></li>
+                    </ul>
+                </div>
+                <div id="userSection" class="d-none">
+                    <span class="text-white me-2" id="userNameDisplay">Guru</span>
+                    <button class="btn btn-sm btn-light text-primary" onclick="logout()">
+                        <i class="fa-solid fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container my-4" id="mainContainer">
+
+        <!-- Login View -->
+        <div id="loginView" class="view-section">
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow-lg border-0 rounded-4 mt-5">
+                        <div class="card-body p-5 text-center">
+                            <h2 class="mb-4 fw-bold text-primary" data-i18n="login">Masuk</h2>
+                            <div class="mb-3">
+                                <input type="text" id="teacherNameInput" class="form-control form-control-lg" placeholder="Nama Guru" required>
+                            </div>
+                            <div class="mb-3 text-start">
+                                <small><a href="#" class="text-muted text-decoration-none" onclick="document.getElementById('apiKeySection').classList.toggle('d-none')"><i class="fa-solid fa-gear"></i> Advanced Settings</a></small>
+                                <div id="apiKeySection" class="d-none mt-2">
+                                    <label class="form-label small text-muted">Custom Gemini API Key</label>
+                                    <input type="password" id="apiKeyInput" class="form-control form-control-sm" placeholder="AIzaSy...">
+                                </div>
+                            </div>
+                            <button class="btn btn-primary btn-lg w-100 rounded-pill" onclick="login()" data-i18n="login">Masuk</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard View -->
+        <div id="dashboardView" class="view-section d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold text-secondary" data-i18n="myGames">Permainan Saya</h2>
+                <div>
+                    <button class="btn btn-info rounded-pill px-4 me-2 text-white" onclick="showView('results')">
+                        <i class="fa-solid fa-chart-line me-2"></i> <span data-i18n="results">Hasil</span>
+                    </button>
+                    <button class="btn btn-success rounded-pill px-4" onclick="showView('creator')">
+                        <i class="fa-solid fa-plus me-2"></i> <span data-i18n="createNew">Buat Baru</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="gamesList" class="row g-4">
+                <!-- Game cards will be injected here -->
+                <div class="col-12 text-center text-muted py-5">
+                    <i class="fa-regular fa-folder-open fa-3x mb-3"></i>
+                    <p data-i18n="noGames">Belum ada permainan.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Creator View -->
+        <div id="creatorView" class="view-section d-none">
+            <div class="card shadow border-0 rounded-4">
+                <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                    <h3 class="fw-bold text-primary mb-0" data-i18n="createNew">Buat Permainan Baru</h3>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="showView('dashboard')" data-i18n="cancel">Batal</button>
+                </div>
+                <div class="card-body p-4">
+                    <form id="gameForm">
+                        <div class="mb-4">
+                            <label class="form-label fw-bold" data-i18n="gameType">Jenis Permainan</label>
+                            <select class="form-select form-select-lg" id="gameTypeSelect">
+                                <option value="quiz" data-i18n="quiz">Kuis</option>
+                                <option value="matching" data-i18n="matching">Mencocokkan</option>
+                                <option value="fillBlank" data-i18n="fillBlank">Isi Titik-Titik</option>
+                            </select>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold" data-i18n="orInput">Topik / Judul</label>
+                                <input type="text" class="form-control" id="topicInput" placeholder="Contoh: Tata Surya">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold" data-i18n="uploadFile">Unggah Materi (Opsional)</label>
+                                <input type="file" class="form-control" id="fileInput" accept=".pdf,.docx,.txt">
+                                <small class="text-muted">AI akan membaca file ini untuk membuat soal.</small>
+                            </div>
+                        </div>
+
+                        <div class="text-center mb-4">
+                            <button type="button" class="btn btn-warning text-dark fw-bold px-5 py-2 rounded-pill shadow-sm" onclick="generateQuestions()">
+                                <i class="fa-solid fa-wand-magic-sparkles me-2"></i> <span data-i18n="generate">Buat dengan AI</span>
+                            </button>
+                        </div>
+
+                        <div id="generatedContent" class="d-none">
+                            <h5 class="fw-bold mb-3" data-i18n="generatedQuestions">Pertanyaan yang Dihasilkan</h5>
+                            <div id="questionsContainer" class="list-group mb-4">
+                                <!-- Editable questions will appear here -->
+                            </div>
+                            <button type="button" class="btn btn-primary w-100 py-2 rounded-pill" onclick="saveGame()" data-i18n="saveGame">Simpan Permainan</button>
+                        </div>
+
+                        <div id="loadingIndicator" class="text-center d-none py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2 text-muted" data-i18n="analyzing">Sedang memproses...</p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Player View -->
+        <div id="gamePlayerView" class="view-section d-none">
+            <!-- Student Login -->
+            <div id="studentLogin" class="text-center py-5">
+                <h2 class="mb-4" data-i18n="studentName">Masukkan Nama Siswa</h2>
+                <input type="text" id="studentNameInput" class="form-control form-control-lg w-50 mx-auto mb-3" placeholder="Nama Anda">
+                <button class="btn btn-success btn-lg rounded-pill px-5" onclick="startGameSession()" data-i18n="play">Mulai</button>
+            </div>
+
+            <!-- The Game Interface -->
+            <div id="gameInterface" class="d-none position-relative">
+                <button class="btn btn-sm btn-outline-light position-absolute top-0 end-0 m-3" onclick="exitGame()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+
+                <!-- Dynamic Game Content -->
+                <div id="gameContainer" class="game-container p-4 bg-white rounded-4 shadow">
+                    <!-- Game specific UI injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Results View -->
+        <div id="resultsView" class="view-section d-none">
+             <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold" data-i18n="results">Hasil Siswa</h2>
+                <div>
+                     <button class="btn btn-success me-2" onclick="exportToExcel()">
+                        <i class="fa-solid fa-file-excel me-2"></i> <span data-i18n="exportExcel">Excel</span>
+                    </button>
+                    <button class="btn btn-outline-secondary" onclick="showView('dashboard')" data-i18n="back">Kembali</button>
+                </div>
+            </div>
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" id="resultsTable">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Nama Siswa</th>
+                                    <th>Permainan</th>
+                                    <th>Skor</th>
+                                    <th>Waktu</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultsBody">
+                                <!-- Results here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- App Scripts -->
+    <script src="js/utils.js"></script>
+    <script src="js/translations.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/fileParser.js"></script>
+    <script src="js/ai.js"></script>
+    <script src="js/gameEngine.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
