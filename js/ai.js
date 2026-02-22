@@ -1,6 +1,6 @@
 // AI Integration Service
 const DEFAULT_API_KEY = "AIzaSyBLGmNBIPCgfF632zxPodza9NiLPKCV6ag";
-const AI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+const AI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
 
 const AIService = {
 
